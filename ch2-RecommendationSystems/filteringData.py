@@ -10,64 +10,50 @@ users = {"Angelica": {"Blues Traveler": 3.5, "Broken Bells": 2.0, "Norah Jones":
          "Veronica": {"Blues Traveler": 3.0, "Norah Jones": 5.0, "Phoenix": 4.0, "Slightly Stoopid": 2.5, "The Strokes": 3.0}
         }
 
+
+
 def manhattan(rating1, rating2):
+    """Computes the Manhattan distance. Both rating1 and rating2 are dictionaries
+       of the form {'The Strokes': 3.0, 'Slightly Stoopid': 2.5}"""
     distance = 0
+    commonRatings = False
     for key in rating1:
         if key in rating2:
             distance += abs(rating1[key] - rating2[key])
-    return distance
-
-def minkowski(rating1, rating2, r):
-    distance = 0.0
-    commonRating = False
-    for key in rating1:
-        if key in rating2:
-            distance += pow(abs(rating1[key] - rating2[key]), r)
-            commonRating = True
-    if commonRating:
-        return pow(distance, 1/r)
+            commonRatings = True
+    if commonRatings:
+        return distance
     else:
-        return 0
+        return -1 #Indicates no ratings in common
+
 
 def computeNearestNeighbor(username, users):
+    """creates a sorted list of users based on their distance to username"""
     distances = []
     for user in users:
         if user != username:
-            distance = manhattan(users[username], users[user])
+            distance = manhattan(users[user], users[username])
             distances.append((distance, user))
+    # sort based on distance -- closest first
     distances.sort()
     return distances
 
 def recommend(username, users):
-    # Find neighbor first
+    """Give list of recommendations"""
+    # first find nearest neighbor
     nearest = computeNearestNeighbor(username, users)[0][1]
+
     recommendations = []
     # now find bands neighbor rated that user didn't
     neighborRatings = users[nearest]
     userRatings = users[username]
-
     for artist in neighborRatings:
         if not artist in userRatings:
             recommendations.append((artist, neighborRatings[artist]))
+    # using the fn sorted for variety - sort is more efficient
+    return sorted(recommendations, key=lambda artistTuple: artistTuple[1], reverse = True)
 
-    return sorted(recommendations, key= lambda artistTuple: artistTuple[1], reverse=True)
+# examples
 
-def pearson(user1, user2):
-    sx, sy, sxx, syy, sxy = 0, 0, 0, 0, 0
-    n = 0
-    for key in user1:
-        if key in user2:
-            n += 1
-            x = user1[key]
-            y = user2[key]
-            sx += x
-            sy += y
-            sxx += x**2
-            syy += y**2
-            sxy += x*y
-
-    if n == 0:
-        return 0
-    r = sxy - (sx*sy)/n
-    r /= sqrt(sxx - (sx**2)/n) * sqrt(syy - (sy**2)/n)
-    return r
+print( recommend('Hailey', users))
+print( recommend('Chan', users))
