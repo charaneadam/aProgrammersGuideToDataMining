@@ -59,7 +59,7 @@ class recommender:
         for rating in ratings:
             print("%s\t%i" % (rating[0], rating[1]))
 
-    def loadBookDB(self, path=''):
+    def loadBookDB(self, path='../data/BX-Dump/'):
         """loads the BX book dataset. Path is where the BX files are
         located"""
         self.data = {}
